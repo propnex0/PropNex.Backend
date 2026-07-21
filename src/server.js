@@ -1,20 +1,9 @@
-const dns = require("dns");
-
-dns.setServers([
-  "8.8.8.8",
-  "8.8.4.4"
-]);
-
-
 require("dotenv").config();
-
 
 const express = require("express");
 const cors = require("cors");
 
-
 const connectDB = require("./config/db");
-
 
 const authRoutes = require("./routes/authRoutes");
 const listingRoutes = require("./routes/listingRoutes");
@@ -22,24 +11,29 @@ const agencyRoutes = require("./routes/agencyRoutes");
 const leadRoutes = require("./routes/leadRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 
-
-
 const app = express();
 
 
+// CORS
 
 app.use(
-  cors()
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://prop-nex-five.vercel.app"
+    ],
+    credentials: true
+  })
 );
 
 
-app.use(
-  express.json()
-);
+// Body Parser
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 
-
-// Static Images
+// Static Files
 
 app.use(
   "/uploads",
@@ -47,103 +41,53 @@ app.use(
 );
 
 
+// API Routes
+
+app.use("/api/auth", authRoutes);
+app.use("/api/leads", leadRoutes);
+app.use("/api/listings", listingRoutes);
+app.use("/api/agency", agencyRoutes);
+app.use("/api/payment", paymentRoutes);
 
 
-// Routes
+// Health Check
 
-app.use(
-  "/api/auth",
-  authRoutes
-);
-
-
-app.use(
-  "/api/leads",
-  leadRoutes
-);
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "PropNex API Running"
+  });
+});
 
 
-app.use(
-  "/api/listings",
-  listingRoutes
-);
+// 404
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route Not Found"
+  });
+});
 
 
-app.use(
-  "/api/agency",
-  agencyRoutes
-);
-
-app.use(
-  "/api/payment",
-  paymentRoutes
-);
+const PORT = process.env.PORT || 5000;
 
 
-// Test API
+const startServer = async () => {
+  try {
 
-app.get(
-  "/",
-  (req,res)=>{
+    await connectDB();
 
-    res.send(
-      "PropNex API Running"
-    );
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
 
+  } catch (error) {
+
+    console.error("SERVER ERROR:", error);
+
+    process.exit(1);
   }
-);
-
-
-
-
-
-const PORT =
-process.env.PORT || 5000;
-
-
-
-
-const startServer = async()=>{
-
-
-try{
-
-
-await connectDB();
-
-
-app.listen(
-PORT,
-()=>{
-
-console.log(
-`Server running on port ${PORT}`
-);
-
-}
-);
-
-
-
-}
-catch(error){
-
-
-console.log(
-"SERVER ERROR:",
-error
-);
-
-
-process.exit(1);
-
-
-}
-
-
-
 };
-
-
 
 startServer();
