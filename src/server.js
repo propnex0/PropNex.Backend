@@ -24,10 +24,20 @@ connectDB();
 app.use(
   cors({
     origin:[
-      "http://localhost:5173",
-      "https://prop-nex-frontend.vercel.app"
+      "https://prop-nex-frontend-fd2aw0fhe-prop-nex1.vercel.app"
     ],
-    credentials:true
+    credentials:true,
+    methods:[
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS"
+    ],
+    allowedHeaders:[
+      "Content-Type",
+      "Authorization"
+    ]
   })
 );
 
