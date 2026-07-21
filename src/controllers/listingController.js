@@ -68,6 +68,8 @@ const createListing = async (req, res) => {
         )
       : [];
 
+console.log("FILES =",req.files);
+
     const video =
       req.files?.video?.[0]
         ? `/uploads/${req.files.video[0].filename}`
