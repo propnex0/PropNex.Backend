@@ -167,9 +167,8 @@ user.propertyTypes =
     : user.propertyTypes;
 
     if (req.file) {
-      user.photo =
-        `/uploads/${req.file.filename}`;
-    }
+  user.photo = req.file.path;
+}
 
     const updatedUser = await user.save();
 
