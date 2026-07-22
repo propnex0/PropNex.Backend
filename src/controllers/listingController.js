@@ -247,7 +247,29 @@ req.files.images.map(
     });
   }
 };
+const getBrokerListings = async (req, res) => {
+  try {
 
+    const user = await User.findOne({
+      name: req.params.name,
+    });
+
+    if (!user) {
+      return res.json([]);
+    }
+
+    const listings = await Listing.find({
+      owner: user._id,
+    });
+
+    res.json(listings);
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 module.exports = {
   createListing,
   getListings,
@@ -255,4 +277,5 @@ module.exports = {
   getSingleListing,
   deleteListing,
   updateListing,
+  getBrokerListings,
 };

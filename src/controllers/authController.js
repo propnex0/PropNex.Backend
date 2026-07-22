@@ -185,6 +185,26 @@ res.json(safeUser);
     });
   }
 };
+const getBrokerProfile = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      name: req.params.name,
+    }).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Broker not found",
+      });
+    }
+
+    res.json(user);
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 const addCredits = async (req,res)=>{
   try{
 
@@ -232,4 +252,5 @@ module.exports = {
   getProfile,
   updateProfile,
   addCredits,
+  getBrokerProfile,
 };

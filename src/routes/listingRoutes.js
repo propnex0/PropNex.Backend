@@ -11,6 +11,7 @@ const {
   getSingleListing,
   deleteListing,
   updateListing,
+  getBrokerListings,
 } = require("../controllers/listingController");
 
 // CREATE LISTING
@@ -35,6 +36,9 @@ router.get("/", protect, getListings);
 
 // MY LISTINGS
 router.get("/my", protect, getMyListings);
+
+// PUBLIC BROKER LISTINGS
+router.get("/broker/:name", getBrokerListings);
 
 // UPDATE LISTING
 router.put(

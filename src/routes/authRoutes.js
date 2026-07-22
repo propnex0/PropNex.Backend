@@ -11,7 +11,8 @@ registerUser,
 loginUser,
 getProfile,
 updateProfile,
-addCredits
+addCredits,
+getBrokerProfile
 }=require("../controllers/authController");
 
 
@@ -29,6 +30,10 @@ router.post(
 loginUser
 );
 
+router.get(
+  "/broker/:name",
+  getBrokerProfile
+);
 
 // PROFILE
 router.get(
