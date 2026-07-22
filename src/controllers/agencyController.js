@@ -8,13 +8,13 @@ const createAgency = async (req, res) => {
     const {
       name,
       ownerName,
-      code
+      code,
+      userId
     } = req.body;
 
-
-    const existingAgency =
-      await Agency.findOne({ code });
-
+    const existingAgency = await Agency.findOne({
+      code
+    });
 
     if (existingAgency) {
       return res.status(400).json({
@@ -22,24 +22,24 @@ const createAgency = async (req, res) => {
       });
     }
 
-
     const agency = await Agency.create({
       name,
       ownerName,
       code,
+      ownerId: userId,
       members: [],
       listings: [],
       leads: []
     });
-
 
     res.status(201).json({
       message: "Agency Created Successfully",
       agency
     });
 
-
   } catch (error) {
+
+    console.log(error);
 
     res.status(500).json({
       message: error.message
@@ -49,7 +49,6 @@ const createAgency = async (req, res) => {
 };
 
 
-
 // JOIN AGENCY
 const joinAgency = async (req, res) => {
 
@@ -57,102 +56,89 @@ const joinAgency = async (req, res) => {
 
     const {
       code,
-      memberName
+      memberName,
+      userId
     } = req.body;
 
-
-    const agency =
-      await Agency.findOne({ code });
-
+    const agency = await Agency.findOne({
+      code
+    });
 
     if (!agency) {
       return res.status(404).json({
-        message:"Invalid Agency Code"
+        message: "Invalid Agency Code"
       });
     }
 
+    const alreadyMember = agency.members.some(
+      (member) =>
+        member.userId?.toString() === userId ||
+        member.name.toLowerCase() ===
+        memberName.toLowerCase()
+    );
 
-
-    const alreadyMember =
-      agency.members.some(
-        (member)=>
-          member.name.toLowerCase() ===
-          memberName.toLowerCase()
-      );
-
-
-    if(alreadyMember){
-
+    if (alreadyMember) {
       return res.status(400).json({
-        message:"Member Already Exists"
+        message: "Member Already Exists"
       });
-
     }
-
-
 
     agency.members.push({
+      userId,
       name: memberName,
-      role:"Agent"
+      role: "Agent"
     });
-
 
     await agency.save();
 
-
-
-    res.json({
-      message:"Joined Agency Successfully",
+    res.status(200).json({
+      message: "Joined Agency Successfully",
       agency
     });
 
+  } catch (error) {
 
-
-  } catch(error){
+    console.log(error);
 
     res.status(500).json({
-      message:error.message
+      message: error.message
     });
 
   }
 
 };
-
 
 
 // GET AGENCY
-const getAgency = async(req,res)=>{
+const getAgency = async (req, res) => {
 
-  try{
+  try {
 
-    const agency =
-      await Agency.findOne({
-        code:req.params.code
-      });
+    const agency = await Agency.findOne({
+      code: req.params.code
+    })
+      .populate("listings")
+      .populate("ownerId", "name email");
 
-
-    if(!agency){
-
+    if (!agency) {
       return res.status(404).json({
-        message:"Agency Not Found"
+        message: "Agency Not Found"
       });
-
     }
-
 
     res.json(agency);
 
+  } catch (error) {
 
-  }catch(error){
+    console.log(error);
 
     res.status(500).json({
-      message:error.message
+      message: error.message
     });
 
   }
 
 };
-
 
 
 module.exports = {

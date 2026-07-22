@@ -18,9 +18,24 @@ const agencySchema = new mongoose.Schema(
       required: true,
     },
 
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
     members: [
       {
-        name: String,
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+
+        name: {
+          type: String,
+          required: true,
+        },
+
         role: {
           type: String,
           default: "Agent",
@@ -38,6 +53,7 @@ const agencySchema = new mongoose.Schema(
     leads: [
       {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "Lead",
       },
     ],
   },
