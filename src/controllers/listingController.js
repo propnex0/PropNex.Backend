@@ -68,7 +68,11 @@ const createListing = async (req, res) => {
     )
   : [];
 
-console.log("FILES =",req.files);
+console.log("BODY =", req.body);
+
+console.log("IMAGES =", req.files?.images);
+console.log("VIDEO =", req.files?.video);
+console.log("AGENT =", req.files?.agentPhoto);
 
     const video =
 req.files?.video?.[0]
