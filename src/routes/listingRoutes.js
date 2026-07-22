@@ -43,7 +43,6 @@ getMyListings
 
 router.put(
   "/:id",
-  protect,
   upload.fields([
     {
       name: "images",

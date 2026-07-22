@@ -63,22 +63,22 @@ const createListing = async (req, res) => {
     } = req.body;
 
     const images = req.files?.images
-      ? req.files.images.map(
-          (file) => `/uploads/${file.filename}`
-        )
-      : [];
+  ? req.files.images.map(
+      (file) => file.path
+    )
+  : [];
 
 console.log("FILES =",req.files);
 
     const video =
-      req.files?.video?.[0]
-        ? `/uploads/${req.files.video[0].filename}`
-        : "";
+req.files?.video?.[0]
+? req.files.video[0].path
+: "";
 
     const agentPhoto =
-      req.files?.agentPhoto?.[0]
-        ? `/uploads/${req.files.agentPhoto[0].filename}`
-        : "";
+req.files?.agentPhoto?.[0]
+? req.files.agentPhoto[0].path
+: "";
 
     const listing = await Listing.create({
       title,
@@ -221,14 +221,14 @@ const updateListing = async (req, res) => {
 
     if (req.files?.agentPhoto?.[0]) {
       updateData.agentPhoto =
-        `/uploads/${req.files.agentPhoto[0].filename}`;
+req.files.agentPhoto[0].path;
     }
 
     if (req.files?.images?.length > 0) {
       updateData.images =
-        req.files.images.map(
-          (file) => `/uploads/${file.filename}`
-        );
+req.files.images.map(
+(file)=>file.path
+);
     }
 
     const listing =

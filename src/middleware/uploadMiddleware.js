@@ -1,17 +1,34 @@
 const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    let folder = "propnex";
 
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+    if (file.fieldname === "images") {
+      folder = "propnex/properties";
+    }
+
+    if (file.fieldname === "agentPhoto") {
+      folder = "propnex/agents";
+    }
+
+    if (file.fieldname === "video") {
+      return {
+        folder: "propnex/videos",
+        resource_type: "video",
+      };
+    }
+
+    return {
+      folder,
+      resource_type: "image",
+    };
   },
 });
 
-const upload = multer({
+module.exports = multer({
   storage,
 });
-
-module.exports = upload;

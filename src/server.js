@@ -40,10 +40,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static Files
 
-app.use(
-  "/uploads",
-  express.static("uploads")
-);
+// app.use(
+//   "/uploads",
+//   express.static("uploads")
+// );
 
 
 // Routes
