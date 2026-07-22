@@ -74,10 +74,7 @@ console.log("IMAGES =", req.files?.images);
 console.log("VIDEO =", req.files?.video);
 console.log("AGENT =", req.files?.agentPhoto);
 
-    const video =
-req.files?.video?.[0]
-? req.files.video[0].path
-: "";
+   const video = req.body.video || "";
 
     const agentPhoto =
 req.files?.agentPhoto?.[0]
