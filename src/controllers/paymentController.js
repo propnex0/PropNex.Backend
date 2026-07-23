@@ -38,15 +38,18 @@ const createOrder = async (req, res) => {
     console.log("Cashfree Response =", response.data);
 
     return res.status(200).json(response.data);
-  } catch (error) {
-    console.log(error.response?.data || error);
+ } catch (error) {
+  console.log("========== CASHFREE ERROR ==========");
+  console.log("Message:", error.message);
+  console.log("Response:", error.response?.data);
+  console.log("Full Error:", error);
 
-    return res.status(500).json({
-      success: false,
-      message: "Unable to create Cashfree order",
-      error: error.response?.data || error.message,
-    });
-  }
+  return res.status(500).json({
+    success: false,
+    message: error.message,
+    error: error.response?.data || error.message,
+  });
+}
 };
 
 module.exports = {
