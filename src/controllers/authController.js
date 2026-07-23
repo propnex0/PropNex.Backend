@@ -41,33 +41,105 @@ const registerUser = async (req, res) => {
     });
 
     // Send Email
-    await sendEmail(
-      email,
-      "PropNex Email Verification",
-      `
-      <div style="font-family:Arial;padding:20px">
+    // Send Professional Email
+await sendEmail(
+  email,
+  "Verify Your PropNex Account",
+  `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Verify Your Email</title>
+</head>
 
-        <h2>Welcome to PropNex</h2>
+<body style="margin:0;padding:0;background:#f4f7fb;font-family:Arial,sans-serif;">
 
-        <p>Your OTP is</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+<tr>
+<td align="center">
 
-        <h1 style="letter-spacing:6px;color:#16a34a;">
-          ${otp}
-        </h1>
+<table width="600" cellpadding="0" cellspacing="0"
+style="background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 5px 20px rgba(0,0,0,.08);">
 
-        <p>
-          This OTP will expire in 10 minutes.
-        </p>
+<tr>
+<td align="center" style="background:#166534;padding:30px;">
+<h1 style="color:#fff;margin:0;font-size:30px;">
+🏡 PropNex
+</h1>
+<p style="color:#d1fae5;margin-top:10px;">
+India's Trusted Real Estate Platform
+</p>
+</td>
+</tr>
 
-        <hr>
+<tr>
+<td style="padding:40px;">
 
-        <p>
-          Team PropNex
-        </p>
+<h2 style="margin-top:0;color:#111827;">
+Verify Your Email
+</h2>
 
-      </div>
-      `
-    );
+<p style="font-size:16px;color:#4b5563;line-height:28px;">
+Hi,
+</p>
+
+<p style="font-size:16px;color:#4b5563;line-height:28px;">
+Thank you for registering with <strong>PropNex</strong>.
+Please use the verification code below to activate your account.
+</p>
+
+<div
+style="
+margin:35px auto;
+width:240px;
+background:#ecfdf5;
+border:2px dashed #16a34a;
+border-radius:12px;
+padding:18px;
+text-align:center;
+font-size:36px;
+font-weight:bold;
+letter-spacing:8px;
+color:#166534;
+">
+${otp}
+</div>
+
+<p style="text-align:center;color:#6b7280;font-size:15px;">
+This OTP is valid for <strong>10 minutes</strong>.
+</p>
+
+<hr style="margin:35px 0;border:none;border-top:1px solid #e5e7eb;">
+
+<p style="font-size:14px;color:#6b7280;line-height:24px;">
+If you did not create a PropNex account, you can safely ignore this email.
+</p>
+
+</td>
+</tr>
+
+<tr>
+<td align="center"
+style="background:#f9fafb;padding:25px;color:#9ca3af;font-size:13px;">
+
+© 2026 PropNex. All Rights Reserved.<br>
+
+This is an automated email. Please do not reply.
+
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
+`
+);
 
     res.status(200).json({
       message: "OTP Sent Successfully",
@@ -83,8 +155,111 @@ const registerUser = async (req, res) => {
   }
 };
 
-   
+   const resendOtp = async (req, res) => {
+
+  try {
+
+
+
+    const { email } = req.body;
+
+
+
+    const user = await User.findOne({ email });
+
+
+
+    if (!user) {
+
+      return res.status(404).json({
+
+        message: "User not found",
+
+      });
+
+    }
+
+
+
+    const otp = Math.floor(
+
+      100000 + Math.random() * 900000
+
+    ).toString();
+
+
+
+    user.otp = otp;
+
+    user.otpExpire = new Date(
+
+      Date.now() + 10 * 60 * 1000
+
+    );
+
+
+
+    await user.save();
+
+
+
+    await sendEmail(
+
+      email,
+
+      "PropNex Email Verification",
+
+      `
+
+      <h2>Your New OTP</h2>
+
+
+
+      <h1 style="letter-spacing:6px;color:#166534;">
+
+        ${otp}
+
+      </h1>
+
+
+
+      <p>
+
+      This OTP expires in 10 minutes.
+
+      </p>
+
+      `
+
+    );
+
+
+
+    res.json({
+
+      message: "OTP Resent Successfully",
+
+    });
+
+
+
+  } catch (error) {
+
+
+
+    res.status(500).json({
+
+      message: error.message,
+
+    });
+
+
+
+  }
+
+};
 const verifyOtp = async (req, res) => {
+  
   try {
     const { email, otp } = req.body;
 
@@ -346,6 +521,7 @@ const addCredits = async (req,res)=>{
 module.exports = {
   registerUser,
   verifyOtp,
+  resendOtp,
   loginUser,
   getProfile,
   updateProfile,
