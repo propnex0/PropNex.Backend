@@ -34,7 +34,7 @@ const createOrder = async (req, res) => {
       },
     };
 
-    const response = await Cashfree.PGCreateOrder(request);
+    const response = await Cashfree.PGCreateOrder("2023-08-01", request);
     console.log("Cashfree Response =", response.data);
 
     return res.status(200).json(response.data);
