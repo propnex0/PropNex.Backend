@@ -109,7 +109,21 @@ const userSchema = new mongoose.Schema(
   packageName:{
     type:String,
     default:"",
-  }
+  },
+
+  otp: {
+  type: String,
+  default: "",
+},
+
+otpExpire: {
+  type: Date,
+},
+
+isVerified: {
+  type: Boolean,
+  default: false,
+},
 
 },
 {

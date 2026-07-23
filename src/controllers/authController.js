@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail");
 
 const registerUser = async (req, res) => {
   try {
@@ -16,27 +17,119 @@ const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
-  name,
-  email,
-  password: hashedPassword,
-  listingCredits: 0,
-  packageName: "",
-});
+    // Generate 6 Digit OTP
+    const otp = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
 
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      message: "User Registered Successfully",
+    const otpExpire = new Date(
+      Date.now() + 10 * 60 * 1000
+    );
+
+    // Create User
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+
+      listingCredits: 0,
+      packageName: "",
+
+      otp,
+      otpExpire,
+      isVerified: false,
     });
+
+    // Send Email
+    await sendEmail(
+      email,
+      "PropNex Email Verification",
+      `
+      <div style="font-family:Arial;padding:20px">
+
+        <h2>Welcome to PropNex</h2>
+
+        <p>Your OTP is</p>
+
+        <h1 style="letter-spacing:6px;color:#16a34a;">
+          ${otp}
+        </h1>
+
+        <p>
+          This OTP will expire in 10 minutes.
+        </p>
+
+        <hr>
+
+        <p>
+          Team PropNex
+        </p>
+
+      </div>
+      `
+    );
+
+    res.status(200).json({
+      message: "OTP Sent Successfully",
+      email,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
+
+   
+const verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        message: "Email already verified",
+      });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(400).json({
+        message: "Invalid OTP",
+      });
+    }
+
+    if (new Date() > user.otpExpire) {
+      return res.status(400).json({
+        message: "OTP Expired",
+      });
+    }
+
+    user.isVerified = true;
+    user.otp = "";
+    user.otpExpire = null;
+
+    await user.save();
+
+    res.json({
+      message: "Email Verified Successfully",
+    });
+
   } catch (error) {
     res.status(500).json({
       message: error.message,
     });
   }
 };
-
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -48,7 +141,11 @@ const loginUser = async (req, res) => {
         message: "Invalid Email or Password",
       });
     }
-
+if (!user.isVerified) {
+  return res.status(401).json({
+    message: "Please verify your email first.",
+  });
+}
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -248,6 +345,7 @@ const addCredits = async (req,res)=>{
 };
 module.exports = {
   registerUser,
+  verifyOtp,
   loginUser,
   getProfile,
   updateProfile,

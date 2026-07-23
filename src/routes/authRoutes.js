@@ -7,27 +7,33 @@ const upload = require("../middleware/uploadMiddleware");
 
 
 const {
-registerUser,
-loginUser,
-getProfile,
-updateProfile,
-addCredits,
-getBrokerProfile
-}=require("../controllers/authController");
+  registerUser,
+  verifyOtp,
+  loginUser,
+  getProfile,
+  updateProfile,
+  addCredits,
+  getBrokerProfile,
+} = require("../controllers/authController");
 
 
 
 // REGISTER
 router.post(
-"/register",
-registerUser
+  "/register",
+  registerUser
 );
 
+// VERIFY OTP
+router.post(
+  "/verify-otp",
+  verifyOtp
+);
 
 // LOGIN
 router.post(
-"/login",
-loginUser
+  "/login",
+  loginUser
 );
 
 router.get(
