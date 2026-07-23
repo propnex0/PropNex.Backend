@@ -11,7 +11,12 @@ const createOrder = async (req, res) => {
     } = req.body;
 
     const orderId = "order_" + Date.now();
-
+console.log("APP ID =", process.env.CASHFREE_APP_ID);
+console.log(
+  "SECRET START =",
+  process.env.CASHFREE_SECRET_KEY?.substring(0, 15)
+);
+console.log("ENV =", process.env.CASHFREE_ENV);
     const response = await axios.post(
       "https://api.cashfree.com/pg/orders",
       {
