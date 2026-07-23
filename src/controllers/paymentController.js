@@ -35,6 +35,7 @@ const createOrder = async (req, res) => {
     };
 
     const response = await Cashfree.PGCreateOrder(request);
+    console.log("Cashfree Response =", response.data);
 
     return res.status(200).json(response.data);
   } catch (error) {
