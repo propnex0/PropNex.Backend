@@ -38,7 +38,7 @@ router.get("/", protect, getListings);
 router.get("/my", protect, getMyListings);
 
 // PUBLIC BROKER LISTINGS
-router.get("/broker/:name", getBrokerListings);
+router.get("/broker/:id", getBrokerListings);
 
 // UPDATE LISTING
 router.put(

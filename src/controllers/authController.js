@@ -479,12 +479,9 @@ res.json(safeUser);
 };
 const getBrokerProfile = async (req, res) => {
   try {
-    const user = await User.findOne({
-  name: {
-    $regex: `^${req.params.name}$`,
-    $options: "i",
-  },
-}).select("-password");
+    const user = await User.findById(
+  req.params.id
+).select("-password");
 
     if (!user) {
       return res.status(404).json({

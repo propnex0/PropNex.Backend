@@ -33,7 +33,7 @@ router.post(
 router.post(
   "/resend-otp", 
   resendOtp);
-  
+
 // LOGIN
 router.post(
   "/login",
@@ -41,7 +41,7 @@ router.post(
 );
 
 router.get(
-  "/broker/:name",
+  "/broker/:id",
   getBrokerProfile
 );
 

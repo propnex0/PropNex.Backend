@@ -250,16 +250,10 @@ req.files.images.map(
 const getBrokerListings = async (req, res) => {
   try {
 
-    const user = await User.findOne({
-      name: req.params.name,
-    });
-
-    if (!user) {
-      return res.json([]);
-    }
-
     const listings = await Listing.find({
-      owner: user._id,
+      owner: req.params.id,
+    }).sort({
+      createdAt: -1,
     });
 
     res.json(listings);
