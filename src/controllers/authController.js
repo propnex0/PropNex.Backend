@@ -295,9 +295,29 @@ const verifyOtp = async (req, res) => {
 
     await user.save();
 
-    res.json({
-      message: "Email Verified Successfully",
-    });
+    const token = jwt.sign(
+  { id: user._id },
+  process.env.JWT_SECRET,
+  {
+    expiresIn: "7d",
+  }
+);
+
+res.json({
+  message: "Email Verified Successfully",
+
+  token,
+
+  _id: user._id,
+
+  name: user.name,
+
+  email: user.email,
+
+  listingCredits: user.listingCredits,
+
+  packageName: user.packageName,
+});
 
   } catch (error) {
     res.status(500).json({
