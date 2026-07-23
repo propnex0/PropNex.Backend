@@ -1,27 +1,53 @@
-const Razorpay = require("razorpay");
+const { Cashfree, CFEnvironment } = require("cashfree-pg");
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+Cashfree.XClientId = process.env.CASHFREE_APP_ID;
+Cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY;
+Cashfree.XEnvironment = CFEnvironment.PRODUCTION;
 
 const createOrder = async (req, res) => {
   try {
-    const { amount } = req.body;
+    const {
+      amount,
+      customerId,
+      customerName,
+      customerEmail,
+      customerPhone,
+    } = req.body;
 
-    const order = await razorpay.orders.create({
-      amount: amount * 100,
-      currency: "INR",
-      receipt: `receipt_${Date.now()}`
-    });
+    const orderId = "order_" + Date.now();
 
-    res.json(order);
+    const request = {
+      order_id: orderId,
+      order_amount: Number(amount),
+      order_currency: "INR",
 
+      customer_details: {
+        customer_id: customerId || orderId,
+        customer_name: customerName,
+        customer_email: customerEmail,
+        customer_phone: customerPhone,
+      },
+
+      order_meta: {
+        return_url:
+          "https://prop-nex-frontend.vercel.app/payment-success?order_id={order_id}",
+      },
+    };
+
+    const response = await Cashfree.PGCreateOrder(request);
+
+    return res.status(200).json(response.data);
   } catch (error) {
-    res.status(500).json({
-      message: error.message
+    console.log(error.response?.data || error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to create Cashfree order",
+      error: error.response?.data || error.message,
     });
   }
 };
 
-module.exports = { createOrder };
+module.exports = {
+  createOrder,
+};
