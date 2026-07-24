@@ -13,10 +13,19 @@ const userSchema = new mongoose.Schema(
     unique:true,
   },
 
-  password:{
-    type:String,
-    required:true,
-  },
+  password: {
+  type: String,
+  required: true,
+},
+
+resetOtp: {
+  type: String,
+  default: "",
+},
+
+resetOtpExpiry: {
+  type: Date,
+},
 
   photo:{
     type:String,

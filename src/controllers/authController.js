@@ -325,6 +325,137 @@ res.json({
     });
   }
 };
+const forgotPassword = async (req, res) => {
+  try {
+
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Email not registered",
+      });
+    }
+
+    const otp = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
+    user.resetOtp = otp;
+
+    user.resetOtpExpiry = new Date(
+      Date.now() + 10 * 60 * 1000
+    );
+
+    await user.save();
+
+    await sendEmail(
+      email,
+      "PropNex Password Reset OTP",
+      `
+      <h2>Password Reset</h2>
+
+      <p>Your OTP is:</p>
+
+      <h1 style="letter-spacing:6px;color:#166534;">
+        ${otp}
+      </h1>
+
+      <p>
+        This OTP expires in 10 minutes.
+      </p>
+      `
+    );
+
+    res.json({
+      message:
+        "OTP sent successfully. Please check your email.",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
+const verifyResetOtp = async (req, res) => {
+  try {
+
+    const { email, otp } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (user.resetOtp !== otp) {
+      return res.status(400).json({
+        message: "Invalid OTP",
+      });
+    }
+
+    if (new Date() > user.resetOtpExpiry) {
+      return res.status(400).json({
+        message: "OTP Expired",
+      });
+    }
+
+    res.json({
+      message: "OTP Verified Successfully",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
+const resetPassword = async (req, res) => {
+  try {
+
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(
+      password,
+      10
+    );
+
+    user.password = hashedPassword;
+
+    user.resetOtp = "";
+
+    user.resetOtpExpiry = null;
+
+    await user.save();
+
+    res.json({
+      message: "Password Updated Successfully",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -542,6 +673,9 @@ module.exports = {
   registerUser,
   verifyOtp,
   resendOtp,
+  forgotPassword,
+  verifyResetOtp,
+  resetPassword,
   loginUser,
   getProfile,
   updateProfile,

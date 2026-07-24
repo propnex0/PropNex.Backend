@@ -9,7 +9,10 @@ const upload = require("../middleware/uploadMiddleware");
 const {
   registerUser,
   verifyOtp,
-resendOtp,
+  resendOtp,
+  forgotPassword,
+  verifyResetOtp,
+  resetPassword,
   loginUser,
   getProfile,
   updateProfile,
@@ -34,6 +37,22 @@ router.post(
   "/resend-otp", 
   resendOtp);
 
+// FORGOT PASSWORD
+router.post(
+  "/forgot-password",
+  forgotPassword
+);
+// VERIFY RESET OTP
+router.post(
+  "/verify-reset-otp",
+  verifyResetOtp
+);
+
+// RESET PASSWORD
+router.post(
+  "/reset-password",
+  resetPassword
+);
 // LOGIN
 router.post(
   "/login",
