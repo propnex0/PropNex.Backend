@@ -78,8 +78,8 @@ console.log("AGENT =", req.files?.agentPhoto);
 
     const agentPhoto =
 req.files?.agentPhoto?.[0]
-? req.files.agentPhoto[0].path
-: "";
+  ? req.files.agentPhoto[0].path
+  : user.photo || "";
 
     const listing = await Listing.create({
       title,
